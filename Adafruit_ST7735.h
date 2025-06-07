@@ -54,7 +54,7 @@ public:
   Adafruit_ST7735(int8_t cs, int8_t dc, int8_t mosi, int8_t sclk, int8_t rst);
   Adafruit_ST7735(int8_t cs, int8_t dc, int8_t rst);
 #if !defined(ESP8266)
-  Adafruit_ST7735(SPIClass *spiClass, int8_t cs, int8_t dc, int8_t rst);
+  Adafruit_ST7735(SPIClass *spiClass = 0, int8_t cs = -1, int8_t dc = -1, int8_t rst = -1);
 #endif // end !ESP8266
 
   // Differences between displays (usu. identified by colored tab on
@@ -65,7 +65,7 @@ public:
   void setRotation(uint8_t m);
 
 private:
-  uint8_t tabcolor;
+  uint8_t tabcolor = 0;
 };
 
 #endif // _ADAFRUIT_ST7735H_
