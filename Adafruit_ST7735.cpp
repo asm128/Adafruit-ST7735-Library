@@ -85,12 +85,7 @@ void Adafruit_ST7735::setRotation(uint8_t m) {
 
   switch (rotation) {
   case 0:
-    if ((tabcolor == INITR_BLACKTAB) || (tabcolor == INITR_MINI160x80)) {
-      madctl = ST77XX_MADCTL_MX | ST77XX_MADCTL_MY | ST77XX_MADCTL_RGB;
-    } else {
-      madctl = ST77XX_MADCTL_MX | ST77XX_MADCTL_MY | ST7735_MADCTL_BGR;
-    }
-
+    madctl = ST77XX_MADCTL_MX | ST77XX_MADCTL_MY | (((tabcolor == INITR_BLACKTAB) || (tabcolor == INITR_MINI160x80)) ? ST77XX_MADCTL_RGB : ST7735_MADCTL_BGR);
     if (tabcolor == INITR_144GREENTAB) {
       _height = ST7735_TFTHEIGHT_128;
       _width = ST7735_TFTWIDTH_128;

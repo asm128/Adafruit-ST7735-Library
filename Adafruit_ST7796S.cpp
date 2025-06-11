@@ -24,6 +24,21 @@
 
 #include "Adafruit_ST7796S.h"
 
+void Adafruit_ST7796S::setRotation(uint8_t m) {
+  uint8_t madctl = 0;
+
+  rotation = m & 3; // can't be higher than 3
+
+  switch (rotation) {
+  case 0: _xstart = _colstart; _ystart = _rowstart; _width  = windowWidth; _height = windowHeight; madctl = _colorOrder | ST77XX_MADCTL_RGB | ST77XX_MADCTL_MX; break;
+  case 1: _xstart = _rowstart; _ystart = _colstart; _height = windowWidth; _width  = windowHeight; madctl = _colorOrder | ST77XX_MADCTL_RGB | ST77XX_MADCTL_MV; break;
+  case 2: _xstart = _colstart; _ystart = _rowstart; _width  = windowWidth; _height = windowHeight; madctl = _colorOrder | ST77XX_MADCTL_RGB | ST77XX_MADCTL_MY; break;
+  case 3: _xstart = _rowstart; _ystart = _colstart; _height = windowWidth; _width  = windowHeight; madctl = _colorOrder | ST77XX_MADCTL_RGB | ST77XX_MADCTL_MY | ST77XX_MADCTL_MX  | ST77XX_MADCTL_MV; break;
+  }
+  Serial.println(madctl, HEX);
+  sendCommand(ST77XX_MADCTL, &madctl, 1);
+}
+
 /**
  * @brief Initialize the display.
  * @param width Display width in pixels.
@@ -48,23 +63,4 @@ void Adafruit_ST7796S::init(uint16_t width, uint16_t height, uint8_t rowOffset,
   invertOffCommand = ST77XX_INVON;
   invertDisplay(false);
   setRotation(0);
-}
-
-/**
- * @brief Set the display rotation.
- * @param m Rotation value (0-3).
- */
-void Adafruit_ST7796S::setRotation(uint8_t m) {
-  uint8_t madctl = 0;
-
-  rotation = m & 3; // can't be higher than 3
-
-  switch (rotation) {
-  case 0: _xstart = _colstart; _ystart = _rowstart; _width  = windowWidth; _height = windowHeight; madctl = _colorOrder | ST77XX_MADCTL_MX | ST77XX_MADCTL_RGB; break;
-  case 1: _xstart = _rowstart; _ystart = _colstart; _height = windowWidth; _width  = windowHeight; madctl = _colorOrder | ST77XX_MADCTL_MV | ST77XX_MADCTL_RGB; break;
-  case 2: _xstart = _colstart; _ystart = _rowstart; _width  = windowWidth; _height = windowHeight; madctl = _colorOrder | ST77XX_MADCTL_MY | ST77XX_MADCTL_RGB; break;
-  case 3: _xstart = _rowstart; _ystart = _colstart; _height = windowWidth; _width  = windowHeight; madctl = _colorOrder | ST77XX_MADCTL_MY | ST77XX_MADCTL_RGB | ST77XX_MADCTL_MX  | ST77XX_MADCTL_MV; break;
-  }
-  Serial.println(madctl, HEX);
-  sendCommand(ST77XX_MADCTL, &madctl, 1);
 }
