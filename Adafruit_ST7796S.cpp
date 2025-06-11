@@ -24,88 +24,6 @@
 
 #include "Adafruit_ST7796S.h"
 
-static const uint8_t PROGMEM st7796s_init[] = {14, // 14 commands
-                                               ST77XX_SWRESET,
-                                               ST_CMD_DELAY, // Software reset
-                                               150,
-                                               0xF0,
-                                               1, // Unlock manufacturer
-                                               0xC3,
-                                               0xF0,
-                                               1,
-                                               0x96,
-                                               0xC5,
-                                               1, // VCOM Control
-                                               0x1C,
-                                               ST77XX_MADCTL,
-                                               1, // Memory Access
-                                               0x48,
-                                               ST77XX_COLMOD,
-                                               1, // Color Mode - 16 bit
-                                               0x55,
-                                               0xB0,
-                                               1, // Interface Control
-                                               0x80,
-                                               0xB4,
-                                               1, // Inversion Control
-                                               0x00,
-                                               0xB6,
-                                               3, // Display Function Control
-                                               0x80,
-                                               0x02,
-                                               0x3B,
-                                               0xB7,
-                                               1, // Entry Mode
-                                               0xC6,
-                                               0xF0,
-                                               1, // Lock manufacturer commands
-                                               0x69,
-                                               0xF0,
-                                               1,
-                                               0x3C,
-                                               ST77XX_SLPOUT,
-                                               ST_CMD_DELAY, // Exit sleep
-                                               150,
-                                               ST77XX_DISPON,
-                                               ST_CMD_DELAY, // Display on
-                                               150};
-
-/**
- * @brief Constructor with software SPI.
- * @param CS Chip select pin.
- * @param RS Data/command pin.
- * @param MOSI SPI MOSI pin.
- * @param SCLK SPI clock pin.
- * @param RST Reset pin (optional).
- */
-Adafruit_ST7796S::Adafruit_ST7796S(int8_t CS, int8_t RS, int8_t MOSI,
-                                   int8_t SCLK, int8_t RST)
-    : Adafruit_ST77xx(ST7796S_TFTWIDTH, ST7796S_TFTHEIGHT, CS, RS, MOSI, SCLK,
-                      RST) {}
-
-/**
- * @brief Constructor with hardware SPI.
- * @param CS Chip select pin.
- * @param RS Data/command pin.
- * @param RST Reset pin (optional).
- */
-Adafruit_ST7796S::Adafruit_ST7796S(int8_t CS, int8_t RS, int8_t RST)
-    : Adafruit_ST77xx(ST7796S_TFTWIDTH, ST7796S_TFTHEIGHT, CS, RS, RST) {}
-
-#if !defined(ESP8266)
-/**
- * @brief Constructor with hardware SPI and custom SPI class.
- * @param spiClass Pointer to SPI class.
- * @param CS Chip select pin.
- * @param RS Data/command pin.
- * @param RST Reset pin (optional).
- */
-Adafruit_ST7796S::Adafruit_ST7796S(SPIClass *spiClass, int8_t CS, int8_t RS,
-                                   int8_t RST)
-    : Adafruit_ST77xx(ST7796S_TFTWIDTH, ST7796S_TFTHEIGHT, spiClass, CS, RS,
-                      RST) {}
-#endif
-
 /**
  * @brief Initialize the display.
  * @param width Display width in pixels.
@@ -142,37 +60,11 @@ void Adafruit_ST7796S::setRotation(uint8_t m) {
   rotation = m & 3; // can't be higher than 3
 
   switch (rotation) {
-  case 0:
-    madctl = ST77XX_MADCTL_MX | ST77XX_MADCTL_RGB | _colorOrder;
-    _xstart = _colstart;
-    _ystart = _rowstart;
-    _width = windowWidth;
-    _height = windowHeight;
-    break;
-  case 1:
-    madctl = ST77XX_MADCTL_MV | ST77XX_MADCTL_RGB | _colorOrder;
-    _xstart = _rowstart;
-    _ystart = _colstart;
-    _height = windowWidth;
-    _width = windowHeight;
-    break;
-  case 2:
-    madctl = ST77XX_MADCTL_MY | ST77XX_MADCTL_RGB | _colorOrder;
-    _xstart = _colstart;
-    _ystart = _rowstart;
-    _width = windowWidth;
-    _height = windowHeight;
-    break;
-  case 3:
-    madctl = ST77XX_MADCTL_MY | ST77XX_MADCTL_MX | ST77XX_MADCTL_MV |
-             ST77XX_MADCTL_RGB | _colorOrder;
-    _xstart = _rowstart;
-    _ystart = _colstart;
-    _height = windowWidth;
-    _width = windowHeight;
-    break;
+  case 0: _xstart = _colstart; _ystart = _rowstart; _width  = windowWidth; _height = windowHeight; madctl = _colorOrder | ST77XX_MADCTL_MX | ST77XX_MADCTL_RGB; break;
+  case 1: _xstart = _rowstart; _ystart = _colstart; _height = windowWidth; _width  = windowHeight; madctl = _colorOrder | ST77XX_MADCTL_MV | ST77XX_MADCTL_RGB; break;
+  case 2: _xstart = _colstart; _ystart = _rowstart; _width  = windowWidth; _height = windowHeight; madctl = _colorOrder | ST77XX_MADCTL_MY | ST77XX_MADCTL_RGB; break;
+  case 3: _xstart = _rowstart; _ystart = _colstart; _height = windowWidth; _width  = windowHeight; madctl = _colorOrder | ST77XX_MADCTL_MY | ST77XX_MADCTL_RGB | ST77XX_MADCTL_MX  | ST77XX_MADCTL_MV; break;
   }
-
   Serial.println(madctl, HEX);
   sendCommand(ST77XX_MADCTL, &madctl, 1);
 }

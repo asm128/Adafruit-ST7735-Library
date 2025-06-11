@@ -27,48 +27,21 @@
 
 #include "Adafruit_ST77xx.h"
 
-#define ST7796S_TFTWIDTH 320
-#define ST7796S_TFTHEIGHT 480
-
-// ST7796S specific commands
-#define ST7796S_RGBCTRL 0xB1
-#define ST7796S_FRMCTR1 0xB2
-#define ST7796S_PWCTRL1 0xC0
-#define ST7796S_PWCTRL2 0xC1
-#define ST7796S_VMCTRL1 0xC5
-#define ST7796S_VMCTRL2 0xC7
-#define ST7796S_PGAMCTRL 0xE0
-#define ST7796S_NGAMCTRL 0xE1
-
-/**
- * @brief Enum for ST7796S color order.
- */
-enum ST7796S_ColorOrder {
-  ST7796S_RGB = 0x00, ///< Red-Green-Blue color order
-  ST7796S_BGR = 0x08  ///< Blue-Green-Red color order
-};
-
 /**
  * @brief Adafruit driver for the ST7796S TFT display.
  */
 class Adafruit_ST7796S : public Adafruit_ST77xx {
+    ST7796S_ColorOrder _colorOrder    = ST7796S_RGB;     ///< Color order setting.
+    uint16_t            windowWidth   = ST7796S_TFTWIDTH;
+    uint16_t            windowHeight  = ST7796S_TFTHEIGHT; ///< Dimensions of the display window.
 public:
-  Adafruit_ST7796S(int8_t CS, int8_t RS, int8_t MOSI, int8_t SCLK,
-                   int8_t RST = -1);
-  Adafruit_ST7796S(int8_t CS, int8_t RS, int8_t RST = -1);
-#if !defined(ESP8266)
-  Adafruit_ST7796S(SPIClass *spiClass, int8_t CS, int8_t RS, int8_t RST);
+    inline Adafruit_ST7796S(int8_t CS, int8_t RS, int8_t RST)                            : Adafruit_ST77xx(ST7796S_TFTWIDTH, ST7796S_TFTHEIGHT, CS, RS, RST) {}
+    inline Adafruit_ST7796S(int8_t CS, int8_t RS, int8_t MOSI, int8_t SCLK, int8_t RST)  : Adafruit_ST77xx(ST7796S_TFTWIDTH, ST7796S_TFTHEIGHT, CS, RS, MOSI, SCLK, RST) {}
+#ifndef ESP8266
+    inline Adafruit_ST7796S(SPIClass *spiClass, int8_t CS, int8_t RS, int8_t RST)        : Adafruit_ST77xx(ST7796S_TFTWIDTH, ST7796S_TFTHEIGHT, spiClass, CS, RS, RST) {}
 #endif
-
-  void init(uint16_t width = ST7796S_TFTWIDTH,
-            uint16_t height = ST7796S_TFTHEIGHT, uint8_t rowOffset = 0,
-            uint8_t colOffset = 0, ST7796S_ColorOrder colorOrder = ST7796S_RGB);
-
-  void setRotation(uint8_t r);
-
-private:
-  ST7796S_ColorOrder _colorOrder;     ///< Color order setting.
-  uint16_t windowWidth, windowHeight; ///< Dimensions of the display window.
+    void init(uint16_t width = ST7796S_TFTWIDTH, uint16_t height = ST7796S_TFTHEIGHT, uint8_t rowOffset = 0, uint8_t colOffset = 0, ST7796S_ColorOrder colorOrder = ST7796S_RGB);
+    void setRotation(uint8_t r);
 };
 
 #endif
