@@ -35,8 +35,8 @@ class Adafruit_ST7796S : public Adafruit_ST77xx {
     uint16_t            windowWidth   = ST7796S_TFTWIDTH;
     uint16_t            windowHeight  = ST7796S_TFTHEIGHT; ///< Dimensions of the display window.
 public:
-    inline Adafruit_ST7796S(int8_t CS, int8_t RS, int8_t RST)                            : Adafruit_ST77xx(ST7796S_TFTWIDTH, ST7796S_TFTHEIGHT, CS, RS, RST) {}
-    inline Adafruit_ST7796S(int8_t CS, int8_t RS, int8_t MOSI, int8_t SCLK, int8_t RST)  : Adafruit_ST77xx(ST7796S_TFTWIDTH, ST7796S_TFTHEIGHT, CS, RS, MOSI, SCLK, RST) {}
+    inline Adafruit_ST7796S(int8_t CS = -1, int8_t RS = -1, int8_t RST = -1)                    : Adafruit_ST77xx(ST7796S_TFTWIDTH, ST7796S_TFTHEIGHT, CS, RS, RST) {}
+    inline Adafruit_ST7796S(int8_t CS, int8_t RS, int8_t MOSI, int8_t SCLK, int8_t RST = -1)    : Adafruit_ST77xx(ST7796S_TFTWIDTH, ST7796S_TFTHEIGHT, CS, RS, MOSI, SCLK, RST) {}
 #ifndef ESP8266
     inline Adafruit_ST7796S(SPIClass *spiClass, int8_t CS, int8_t RS, int8_t RST)        : Adafruit_ST77xx(ST7796S_TFTWIDTH, ST7796S_TFTHEIGHT, spiClass, CS, RS, RST) {}
 #endif

@@ -117,7 +117,9 @@ public:
     uint8_t _rowstart = 0;       ///< Some displays need this changed to offset
     uint8_t spiMode = SPI_MODE0; ///< Certain display needs MODE3 instead
 
-    Adafruit_ST77xx(uint16_t w, uint16_t h, int8_t cs, int8_t dc, int8_t rst = -1) : Adafruit_SPITFT(w, h, cs, dc, rst) {}
+    
+
+    Adafruit_ST77xx(uint16_t w = 80, uint16_t h = 160, int8_t cs = -1, int8_t dc = -1, int8_t rst = -1) : Adafruit_SPITFT(w, h, cs, dc, rst) {}
     Adafruit_ST77xx(uint16_t w, uint16_t h, int8_t cs, int8_t dc, int8_t mosi, int8_t sclk, int8_t rst = -1, int8_t miso = -1) : Adafruit_SPITFT(w, h, cs, dc, mosi, sclk, rst, miso) {} 
 #ifndef ESP8266
     Adafruit_ST77xx(uint16_t w, uint16_t h, SPIClass *spiClass, int8_t cs, int8_t dc, int8_t rst = -1) : Adafruit_SPITFT(w, h, spiClass, cs, dc, rst) {}

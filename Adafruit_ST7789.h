@@ -11,8 +11,8 @@ protected:
   uint16_t windowWidth  = 240;
   uint16_t windowHeight = 135;
 public:
-    inline Adafruit_ST7789(int8_t CS, int8_t RS, int8_t RST)                            : Adafruit_ST77xx(240, 135, CS, RS, RST) {}
-    inline Adafruit_ST7789(int8_t CS, int8_t RS, int8_t MOSI, int8_t SCLK, int8_t RST)  : Adafruit_ST77xx(240, 135, CS, RS, MOSI, SCLK, RST) {}
+    inline Adafruit_ST7789(int8_t CS = -1, int8_t RS = -1, int8_t RST = -1)                    : Adafruit_ST77xx(240, 135, CS, RS, RST) {}
+    inline Adafruit_ST7789(int8_t CS, int8_t RS, int8_t MOSI, int8_t SCLK, int8_t RST = -1)    : Adafruit_ST77xx(240, 135, CS, RS, MOSI, SCLK, RST) {}
 #ifndef ESP8266
     inline Adafruit_ST7789(SPIClass *spiClass, int8_t CS, int8_t RS, int8_t RST)        : Adafruit_ST77xx(240, 135, spiClass, CS, RS, RST) {}
 #endif
