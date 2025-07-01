@@ -1,4 +1,3 @@
-#include "Adafruit_ST7789.h"
 #include "Adafruit_ST77xx.h"
 
 void Adafruit_ST7789::setRotation(uint8_t m) {
@@ -6,10 +5,10 @@ void Adafruit_ST7789::setRotation(uint8_t m) {
 
   rotation = m & 3; // can't be higher than 3
   switch (rotation) {  
-  case 0: _xstart = _colstart ; _ystart = _rowstart ; _width  = windowWidth; _height = windowHeight; madctl = ST77XX_MADCTL_RGB | ST77XX_MADCTL_MX | ST77XX_MADCTL_MY; break; 
-  case 1: _xstart = _rowstart ; _ystart = _colstart2; _height = windowWidth; _width  = windowHeight; madctl = ST77XX_MADCTL_RGB | ST77XX_MADCTL_MY | ST77XX_MADCTL_MV; break; 
-  case 2: _xstart = _colstart2; _ystart = _rowstart2; _width  = windowWidth; _height = windowHeight; madctl = ST77XX_MADCTL_RGB; break; 
-  case 3: _xstart = _rowstart2; _ystart = _colstart ; _height = windowWidth; _width  = windowHeight; madctl = ST77XX_MADCTL_RGB | ST77XX_MADCTL_MX | ST77XX_MADCTL_MV; break; 
+  case 0: _xstart = _colstart ; _ystart = _rowstart ; _width  = this->WIDTH; _height = this->HEIGHT; madctl = ST77XX_MADCTL_RGB | ST77XX_MADCTL_MX | ST77XX_MADCTL_MY; break; 
+  case 1: _xstart = _rowstart ; _ystart = _colstart2; _height = this->WIDTH; _width  = this->HEIGHT; madctl = ST77XX_MADCTL_RGB | ST77XX_MADCTL_MY | ST77XX_MADCTL_MV; break; 
+  case 2: _xstart = _colstart2; _ystart = _rowstart2; _width  = this->WIDTH; _height = this->HEIGHT; madctl = ST77XX_MADCTL_RGB; break; 
+  case 3: _xstart = _rowstart2; _ystart = _colstart ; _height = this->WIDTH; _width  = this->HEIGHT; madctl = ST77XX_MADCTL_RGB | ST77XX_MADCTL_MX | ST77XX_MADCTL_MV; break; 
   }
   sendCommand(ST77XX_MADCTL, &madctl, 1);
 }
@@ -44,8 +43,8 @@ void Adafruit_ST7789::init(uint16_t width, uint16_t height, uint8_t mode) {
     _colstart = _colstart2 = (int)((240 - width) / 2);
   }
 
-  windowWidth = width;
-  windowHeight = height;
+  this->_width   = this->WIDTH   = width;
+  this->_height  = this->HEIGHT  = height;
 
   displayInit(generic_st7789);
   setRotation(0);

@@ -22,8 +22,6 @@
   MIT license, all text above must be included in any redistribution
  **************************************************************************/
 
-#include "Arduino.h"
-#include "Print.h"
 #include <Adafruit_GFX.h>
 #include <Adafruit_SPITFT.h>
 #include <Adafruit_SPITFT_Macros.h>
@@ -102,7 +100,7 @@
  * @brief Enum for ST7796S color order.
  */
 enum ST7796S_ColorOrder {
-  ST7796S_RGB = 0x00, ///< Red-Green-Blue color order
+  ST7796S_RGB = 0, ///< Red-Green-Blue color order
   ST7796S_BGR = 0x08  ///< Blue-Green-Red color order
 };
 
@@ -113,11 +111,9 @@ protected:
     void commonInit(const uint8_t *cmdList)  { begin(); if (cmdList) displayInit(cmdList); }
     void displayInit(const uint8_t *addr);
 public:
-    uint8_t _colstart = 0;   ///< Some displays need this changed to offset
-    uint8_t _rowstart = 0;       ///< Some displays need this changed to offset
-    uint8_t spiMode = SPI_MODE0; ///< Certain display needs MODE3 instead
-
-    
+    uint8_t   _colstart = 0;   ///< Some displays need this changed to offset
+    uint8_t   _rowstart = 0;       ///< Some displays need this changed to offset
+    uint8_t   spiMode = SPI_MODE0; ///< Certain display needs MODE3 instead
 
     Adafruit_ST77xx(uint16_t w = 80, uint16_t h = 160, int8_t cs = -1, int8_t dc = -1, int8_t rst = -1) : Adafruit_SPITFT(w, h, cs, dc, rst) {}
     Adafruit_ST77xx(uint16_t w, uint16_t h, int8_t cs, int8_t dc, int8_t mosi, int8_t sclk, int8_t rst = -1, int8_t miso = -1) : Adafruit_SPITFT(w, h, cs, dc, mosi, sclk, rst, miso) {} 
@@ -143,12 +139,12 @@ public:
 // Init commands for 7789 screens
 static const uint8_t PROGMEM generic_st7789[] =  
     { 9                              //  9 commands in list:
-    , ST77XX_SWRESET,   ST_CMD_DELAY, 150 //  1: Software reset, no args, w/delay ~150 ms delay
-    , ST77XX_SLPOUT ,   ST_CMD_DELAY, 10 //  2: Out of sleep mode, no args, w/delay
-    , ST77XX_COLMOD , 1+ST_CMD_DELAY, 0x55, 10                         //3: Set color mode, 1 arg + delay:     16-bit color 10 ms delay
+    , ST77XX_SWRESET, ST_CMD_DELAY, 150 //  1: Software reset, no args, w/delay ~150 ms delay
+    , ST77XX_SLPOUT , ST_CMD_DELAY, 10 //  2: Out of sleep mode, no args, w/delay
+    , ST77XX_COLMOD , ST_CMD_DELAY + 1, 0x55, 10                         //3: Set color mode, 1 arg + delay:     16-bit color 10 ms delay
     , ST77XX_MADCTL , 1, 0x08             //  4: Mem access ctrl (directions), 1 arg://     Row/col addr, bottom-top refresh
-    , ST77XX_CASET  , 4, 0x00, 0, 0, 240             //  5: Column addr set, 4 args, no delay: XSTART = 0 XEND = 240
-    , ST77XX_RASET  , 4, 0x00, 0, 320 >> 8, 320 & 0xFF  //  6: Row addr set, 4 args, no delay: YSTART = 0YEND = 320
+    , ST77XX_CASET  , 4, 0, 0, 0, 240             //  5: Column addr set, 4 args, no delay: XSTART = 0 XEND = 240
+    , ST77XX_RASET  , 4, 0, 0, 320 >> 8, 320 & 0xFF  //  6: Row addr set, 4 args, no delay: YSTART = 0YEND = 320
     , ST77XX_INVON  , ST_CMD_DELAY, 10 //  7: hack
     , ST77XX_NORON  , ST_CMD_DELAY, 10 //  8: Normal display on, no args, w/delay
     , ST77XX_DISPON , ST_CMD_DELAY, 10 //  9: Main screen turn on, no args, delay
@@ -237,7 +233,7 @@ static const uint8_t PROGMEM
       0x05,                         //     16-bit color
       10,                           //     10 ms delay
     ST7735_FRMCTR1, 3+ST_CMD_DELAY, //  4: Frame rate control, 3 args + delay:
-      0x00,                         //     fastest refresh
+      0,                         //     fastest refresh
       0x06,                         //     6 lines front porch
       0x03,                         //     3 lines back porch
       10,                           //     10 ms delay
@@ -276,11 +272,11 @@ static const uint8_t PROGMEM
       0x06, 0x06, 0x02, 0x0F,
       10,                           //     10 ms delay
     ST77XX_CASET,   4,              // 15: Column addr set, 4 args, no delay:
-      0x00, 0x02,                   //     XSTART = 2
-      0x00, 0x81,                   //     XEND = 129
+      0, 0x02,                   //     XSTART = 2
+      0, 0x81,                   //     XEND = 129
     ST77XX_RASET,   4,              // 16: Row addr set, 4 args, no delay:
-      0x00, 0x02,                   //     XSTART = 1
-      0x00, 0x81,                   //     XEND = 160
+      0, 0x02,                   //     XSTART = 1
+      0, 0x81,                   //     XEND = 160
     ST77XX_NORON,     ST_CMD_DELAY, // 17: Normal display on, no args, w/delay
       10,                           //     10 ms delay
     ST77XX_DISPON,    ST_CMD_DELAY, // 18: Main screen turn on, no args, delay
@@ -309,7 +305,7 @@ static const uint8_t PROGMEM
       0xC5,                         //     VGH25=2.4C VGSEL=-10 VGH=3 * AVDD
     ST7735_PWCTR3,  2,              //  9: Power control, 2 args, no delay:
       0x0A,                         //     Opamp current small
-      0x00,                         //     Boost frequency
+      0,                         //     Boost frequency
     ST7735_PWCTR4,  2,              // 10: Power control, 2 args, no delay:
       0x8A,                         //     BCLK/2,
       0x2A,                         //     opamp current small & medium low
@@ -320,72 +316,94 @@ static const uint8_t PROGMEM
     ST77XX_INVOFF,  0,              // 13: Don't invert display, no args
     ST77XX_MADCTL,  1,              // 14: Mem access ctl (directions), 1 arg:
       0xC8,                         //     row/col addr, bottom-top refresh
-    ST77XX_COLMOD,  1,              // 15: set color mode, 1 arg, no delay:
-      0x05 },                       //     16-bit color
-
-  Rcmd2green[] = {                  // 7735R init, part 2 (green tab only)
-    2,                              //  2 commands in list:
-    ST77XX_CASET,   4,              //  1: Column addr set, 4 args, no delay:
-      0x00, 0x02,                   //     XSTART = 0
-      0x00, 0x7F+0x02,              //     XEND = 127
-    ST77XX_RASET,   4,              //  2: Row addr set, 4 args, no delay:
-      0x00, 0x01,                   //     XSTART = 0
-      0x00, 0x9F+0x01 },            //     XEND = 159
-
-  Rcmd2red[] = {                    // 7735R init, part 2 (red tab only)
-    2,                              //  2 commands in list:
-    ST77XX_CASET,   4,              //  1: Column addr set, 4 args, no delay:
-      0x00, 0x00,                   //     XSTART = 0
-      0x00, 0x7F,                   //     XEND = 127
-    ST77XX_RASET,   4,              //  2: Row addr set, 4 args, no delay:
-      0x00, 0x00,                   //     XSTART = 0
-      0x00, 0x9F },                 //     XEND = 159
-
-  Rcmd2green144[] = {               // 7735R init, part 2 (green 1.44 tab)
-    2,                              //  2 commands in list:
-    ST77XX_CASET,   4,              //  1: Column addr set, 4 args, no delay:
-      0x00, 0x00,                   //     XSTART = 0
-      0x00, 0x7F,                   //     XEND = 127
-    ST77XX_RASET,   4,              //  2: Row addr set, 4 args, no delay:
-      0x00, 0x00,                   //     XSTART = 0
-      0x00, 0x7F },                 //     XEND = 127
-
-  Rcmd2green160x80[] = {            // 7735R init, part 2 (mini 160x80)
-    2,                              //  2 commands in list:
-    ST77XX_CASET,   4,              //  1: Column addr set, 4 args, no delay:
-      0x00, 0x00,                   //     XSTART = 0
-      0x00, 0x4F,                   //     XEND = 79
-    ST77XX_RASET,   4,              //  2: Row addr set, 4 args, no delay:
-      0x00, 0x00,                   //     XSTART = 0
-      0x00, 0x9F },                 //     XEND = 159
-
-  Rcmd2green160x80plugin[] = {      // 7735R init, part 2 (mini 160x80 with plugin FPC)
-    3,                              //  3 commands in list:
-    ST77XX_INVON,  0,              //   1: Display is inverted
-    ST77XX_CASET,   4,              //  2: Column addr set, 4 args, no delay:
-      0x00, 0x00,                   //     XSTART = 0
-      0x00, 0x4F,                   //     XEND = 79
-    ST77XX_RASET,   4,              //  3: Row addr set, 4 args, no delay:
-      0x00, 0x00,                   //     XSTART = 0
-      0x00, 0x9F },                 //     XEND = 159
-
-  Rcmd3[] = {                       // 7735R init, part 3 (red or green tab)
-    4,                              //  4 commands in list:
-    ST7735_GMCTRP1, 16      ,       //  1: Gamma Adjustments (pos. polarity), 16 args + delay:
-      0x02, 0x1c, 0x07, 0x12,       //     (Not entirely necessary, but provides
-      0x37, 0x32, 0x29, 0x2d,       //      accurate colors)
-      0x29, 0x25, 0x2B, 0x39,
-      0x00, 0x01, 0x03, 0x10,
-    ST7735_GMCTRN1, 16      ,       //  2: Gamma Adjustments (neg. polarity), 16 args + delay:
-      0x03, 0x1d, 0x07, 0x06,       //     (Not entirely necessary, but provides
-      0x2E, 0x2C, 0x29, 0x2D,       //      accurate colors)
-      0x2E, 0x2E, 0x37, 0x3F,
-      0x00, 0x00, 0x02, 0x10,
-    ST77XX_NORON,     ST_CMD_DELAY, //  3: Normal display on, no args, w/delay
-      10,                           //     10 ms delay
-    ST77XX_DISPON,    ST_CMD_DELAY, //  4: Main screen turn on, no args w/delay
-      100 };                        //     100 ms delay
+    ST77XX_COLMOD,  1, 5             // 15: set color mode, 1 arg, no delay:  16-bit color
+    },                       //   
+  Rcmd2green[] =                   // 7735R init, part 2 (green tab only)
+    { 2                              //  2 commands in list:
+    , ST77XX_CASET,   4, 0, 2, 0, 0x7F+0x02              //  1: Column addr set, 4 args, no delay: XSTART = 0 XEND = 127//    
+    , ST77XX_RASET,   4, 0, 1, 0, 0x9F+0x01            //  2: Row addr set, 4 args, no delay: XSTART = 0  XEND = 159 //   
+    }
+  , Rcmd2red[] =                     // 7735R init, part 2 (red tab only)
+    { 2
+    , ST77XX_CASET,   4, 0, 0, 0, 0x7F    //  1: Column addr set, 4 args, no delay:    XSTART = 0  XEND = 127
+    , ST77XX_RASET,   4, 0, 0, 0, 0x9F    //  2: Row addr set, 4 args, no delay:    XSTART = 0  XEND = 159
+    }
+  , Rcmd2green144[] =                // 7735R init, part 2 (green 1.44 tab)
+    { 2 //  2 commands in list:
+    , ST77XX_CASET,   4, 0, 0, 0, 0x7F              //  1: Column addr set, 4 args, no delay: XSTART = 0   XEND = 127
+    , ST77XX_RASET,   4, 0, 0, 0, 0x7F              //  2: Row addr set, 4 args, no delay:  XSTART = 0   XEND = 127
+    }
+  , Rcmd2green160x80[] =            // 7735R init, part 2 (mini 160x80)
+    { 2                              //  2 commands in list:
+    , ST77XX_CASET, 4, 0, 0, 0, 0x4F                   //  1: Column addr set, 4 args, no delay:XSTART = 0   XEND = 79
+    , ST77XX_RASET, 4, 0, 0, 0, 0x9F                 //  2: Row addr set, 4 args, no delay:XSTART = 0   XEND = 159
+    }
+  , Rcmd2green160x80plugin[] =       // 7735R init, part 2 (mini 160x80 with plugin FPC)
+    { 3                              //  3 commands in list:
+    , ST77XX_INVON, 0              //   1: Display is inverted
+    , ST77XX_CASET, 4, 0, 0, 0, 0x4F                   //  2: Column addr set, 4 args, no delay:XSTART = 0   XEND = 79
+    , ST77XX_RASET, 4, 0, 0, 0, 0x9F                 //     3: Row addr set, 4 args, no delay:XSTART = 0 XEND = 159
+    }
+  , Rcmd3[] =                        // 7735R init, part 3 (red or green tab)
+    { 4                              //  4 commands in list:
+    , ST7735_GMCTRP1, 16           //  1: Gamma Adjustments (pos. polarity), 16 args + delay:
+    , 0x02, 0x1c, 0x07, 0x12       //     (Not entirely necessary, but provides accurate colors)
+    , 0x37, 0x32, 0x29, 0x2d       //      
+    , 0x29, 0x25, 0x2B, 0x39
+    , 0, 0x01, 0x03, 0x10
+    , ST7735_GMCTRN1, 16             //  2: Gamma Adjustments (neg. polarity), 16 args + delay:
+    , 0x03, 0x1d, 0x07, 0x06       //     (Not entirely necessary, but provides accurate colors)
+    , 0x2E, 0x2C, 0x29, 0x2D       //      
+    , 0x2E, 0x2E, 0x37, 0x3F
+    , 0, 0, 0x02, 0x10
+    , ST77XX_NORON, ST_CMD_DELAY, 10 //  3: Normal display on, no args, w/ ten ms delay
+    , ST77XX_DISPON, ST_CMD_DELAY, 100 //  4: Main screen turn on, no args w/ 100 ms delay
+    };                        
 
 // clang-format on
+class Adafruit_ST7796S : public Adafruit_ST77xx {
+    ST7796S_ColorOrder _colorOrder    = ST7796S_RGB;     ///< Color order setting.
+public:
+    inline Adafruit_ST7796S(int8_t CS = -1, int8_t RS = -1, int8_t RST = -1)                    : Adafruit_ST77xx(ST7796S_TFTWIDTH, ST7796S_TFTHEIGHT, CS, RS, RST) {}
+    inline Adafruit_ST7796S(int8_t CS, int8_t RS, int8_t MOSI, int8_t SCLK, int8_t RST = -1)    : Adafruit_ST77xx(ST7796S_TFTWIDTH, ST7796S_TFTHEIGHT, CS, RS, MOSI, SCLK, RST) {}
+#ifndef ESP8266
+    inline Adafruit_ST7796S(SPIClass *spiClass, int8_t CS, int8_t RS, int8_t RST)               : Adafruit_ST77xx(ST7796S_TFTWIDTH, ST7796S_TFTHEIGHT, spiClass, CS, RS, RST) {}
+#endif
+    void init(uint16_t width = ST7796S_TFTWIDTH, uint16_t height = ST7796S_TFTHEIGHT, uint8_t rowOffset = 0, uint8_t colOffset = 0, ST7796S_ColorOrder colorOrder = ST7796S_RGB);
+    void setRotation(uint8_t r);
+};
+
+/// Subclass of ST77XX type display for ST7789 TFT Driver
+class Adafruit_ST7789 : public Adafruit_ST77xx {
+protected:
+  uint8_t _colstart2 = 0, ///< Offset from the right
+      _rowstart2 = 0;     ///< Offset from the bottom
+public:
+    inline Adafruit_ST7789(int8_t CS = -1, int8_t RS = -1, int8_t RST = -1)                     : Adafruit_ST77xx(240, 135, CS, RS, RST) {}
+    inline Adafruit_ST7789(int8_t CS, int8_t RS, int8_t MOSI, int8_t SCLK, int8_t RST = -1)     : Adafruit_ST77xx(240, 135, CS, RS, MOSI, SCLK, RST) {}
+#ifndef ESP8266 
+    inline Adafruit_ST7789(SPIClass * spiClass, int8_t CS, int8_t RS, int8_t RST)               : Adafruit_ST77xx(240, 135, spiClass, CS, RS, RST) {}
+#endif
+ // end !ESP8266
+
+  void setRotation(uint8_t m);
+  void init(uint16_t width, uint16_t height, uint8_t spiMode = SPI_MODE0);
+
+};
+
+/// Subclass of ST77XX for ST7735B and ST7735R TFT Drivers:
+class Adafruit_ST7735 : public Adafruit_ST77xx {
+  uint8_t tabcolor = 0;
+public:
+    inline Adafruit_ST7735(int8_t CS = -1, int8_t RS = -1, int8_t RST = -1)                     : Adafruit_ST77xx(ST7735_TFTWIDTH_80, ST7735_TFTHEIGHT_160, CS, RS, RST) {}
+    inline Adafruit_ST7735(int8_t CS, int8_t RS, int8_t MOSI, int8_t SCLK, int8_t RST = -1)     : Adafruit_ST77xx(ST7735_TFTWIDTH_80, ST7735_TFTHEIGHT_160, CS, RS, MOSI, SCLK, RST) {}
+#ifndef ESP8266
+    inline Adafruit_ST7735(SPIClass * spiClass, int8_t CS, int8_t RS, int8_t RST)               : Adafruit_ST77xx(ST7735_TFTWIDTH_80, ST7735_TFTHEIGHT_160, spiClass, CS, RS, RST) {}
+#endif
+    // Differences between displays (usu. identified by colored tab on plastic overlay) are odd enough that we need to do this 'by hand':
+    void initB();                             // for ST7735B displays
+    void initR(uint8_t options = INITR_GREENTAB); // for ST7735R
+    void setRotation(uint8_t m);
+};
 
 #endif // _ADAFRUIT_ST77XXH_

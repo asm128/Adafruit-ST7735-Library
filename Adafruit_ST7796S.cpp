@@ -21,8 +21,7 @@
 // LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
-
-#include "Adafruit_ST7796S.h"
+#include "Adafruit_ST77xx.h"
 
 void Adafruit_ST7796S::setRotation(uint8_t m) {
   uint8_t madctl = 0;
@@ -30,10 +29,10 @@ void Adafruit_ST7796S::setRotation(uint8_t m) {
   rotation = m & 3; // can't be higher than 3
 
   switch (rotation) {
-  case 0: _xstart = _colstart; _ystart = _rowstart; _width  = windowWidth; _height = windowHeight; madctl = _colorOrder | ST77XX_MADCTL_RGB | ST77XX_MADCTL_MX; break;
-  case 1: _xstart = _rowstart; _ystart = _colstart; _height = windowWidth; _width  = windowHeight; madctl = _colorOrder | ST77XX_MADCTL_RGB | ST77XX_MADCTL_MV; break;
-  case 2: _xstart = _colstart; _ystart = _rowstart; _width  = windowWidth; _height = windowHeight; madctl = _colorOrder | ST77XX_MADCTL_RGB | ST77XX_MADCTL_MY; break;
-  case 3: _xstart = _rowstart; _ystart = _colstart; _height = windowWidth; _width  = windowHeight; madctl = _colorOrder | ST77XX_MADCTL_RGB | ST77XX_MADCTL_MY | ST77XX_MADCTL_MX  | ST77XX_MADCTL_MV; break;
+  case 0: _xstart = _colstart; _ystart = _rowstart; _width  = this->WIDTH; _height = this->HEIGHT; madctl = _colorOrder | ST77XX_MADCTL_RGB | ST77XX_MADCTL_MX; break;
+  case 1: _xstart = _rowstart; _ystart = _colstart; _height = this->WIDTH; _width  = this->HEIGHT; madctl = _colorOrder | ST77XX_MADCTL_RGB | ST77XX_MADCTL_MV; break;
+  case 2: _xstart = _colstart; _ystart = _rowstart; _width  = this->WIDTH; _height = this->HEIGHT; madctl = _colorOrder | ST77XX_MADCTL_RGB | ST77XX_MADCTL_MY; break;
+  case 3: _xstart = _rowstart; _ystart = _colstart; _height = this->WIDTH; _width  = this->HEIGHT; madctl = _colorOrder | ST77XX_MADCTL_RGB | ST77XX_MADCTL_MY | ST77XX_MADCTL_MX  | ST77XX_MADCTL_MV; break;
   }
   Serial.println(madctl, HEX);
   sendCommand(ST77XX_MADCTL, &madctl, 1);
@@ -49,13 +48,13 @@ void Adafruit_ST7796S::setRotation(uint8_t m) {
  */
 void Adafruit_ST7796S::init(uint16_t width, uint16_t height, uint8_t rowOffset,
                             uint8_t colOffset, ST7796S_ColorOrder colorOrder) {
-  _width = width;
-  _height = height;
+  this->_width  = width;
+  this->_height = height;
   _rowstart = rowOffset;
   _colstart = colOffset;
   _colorOrder = colorOrder;
-  windowWidth = width;
-  windowHeight = height;
+  this->WIDTH   = width;
+  this->HEIGHT  = height;
 
   commonInit(NULL);
   displayInit(st7796s_init);
